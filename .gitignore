@@ -1,0 +1,37 @@
+﻿# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Databases & local data
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+data/
+*.csv
+
+# Python byte-code / cache
+__pycache__/
+*.py[cod]
+*.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# IDE & Editor settings
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS generated
+.DS_Store
+Thumbs.db
