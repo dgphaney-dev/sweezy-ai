@@ -4,14 +4,14 @@
 
 <p align="center">
   <strong>Plataforma Corporativa de Inteligencia Comercial e Prospeccao Ativa B2B</strong><br>
-  Varredura Geografica em Grade Circular &bull; Enriquecimento Oficial na Receita Federal via BrasilAPI &bull; Detecao Heuristica de PDV/ERP &bull; Qualificacao Cognitiva GPT-4o-mini
+  Varredura Geografica em Grade Circular &bull; Enriquecimento Oficial na Receita Federal via BrasilAPI &bull; Detecao Heuristica de PDV/ERP &bull; Qualificacao Deterministica com Custo Zero
 </p>
 
 <p align="center">
   <a href="#2-arquitetura-do-sistema-e-fluxo-de-dados"><img src="https://img.shields.io/badge/Arquitetura-Async%20Pipeline-2DD4BF?style=for-the-badge&logo=diagram-next&logoColor=black" alt="Arquitetura"></a>
   <a href="#3-subsistemas-principais-e-especificacoes-tecnicas"><img src="https://img.shields.io/badge/Versao-v1.0%20Enterprise-3B82F6?style=for-the-badge&logo=git&logoColor=white" alt="Versao"></a>
-  <a href="#7-qualificacao-cognitiva-e-modelo-de-scoring"><img src="https://img.shields.io/badge/Cognitivo-GPT--4o--mini-10B981?style=for-the-badge&logo=openai&logoColor=white" alt="Cognitivo"></a>
-  <a href="#10-benchmarks-e-viabilidade-financeira"><img src="https://img.shields.io/badge/Operacao-Baixo%20Custo%20ROI-F59E0B?style=for-the-badge&logo=award" alt="Operacao"></a>
+  <a href="#7-qualificacao-deterministica-e-modelo-de-scoring"><img src="https://img.shields.io/badge/Qualificacao-Motor%20Local%20(Zero--Cost)-10B981?style=for-the-badge&logo=python&logoColor=white" alt="Qualificacao"></a>
+  <a href="#10-benchmarks-e-viabilidade-financeira"><img src="https://img.shields.io/badge/Operacao-100%25%20Gratuito%20(R$%200%2C00)-F59E0B?style=for-the-badge&logo=award" alt="Operacao"></a>
 </p>
 
 <p align="center">
@@ -35,7 +35,7 @@
 - [4. Engenharia de Dados e Topologia de Armazenamento](#4-engenharia-de-dados-e-topologia-de-armazenamento)
 - [5. Motor de Descoberta Geografica e Grid Scanner](#5-motor-de-descoberta-geografica-e-grid-scanner)
 - [6. Motor Heuristico de Detecao de PDV/ERP](#6-motor-heuristico-de-detecao-de-pdverp)
-- [7. Qualificacao Cognitiva e Modelo de Scoring](#7-qualificacao-cognitiva-e-modelo-de-scoring)
+- [7. Qualificacao Deterministica e Modelo de Scoring](#7-qualificacao-deterministica-e-modelo-de-scoring)
 - [8. Estrutura do Repositorio](#8-estrutura-do-repositorio)
 - [9. Guia de Instalacao e Execucao](#9-guia-de-instalacao-e-execucao)
 - [10. Benchmarks e Viabilidade Financeira](#10-benchmarks-e-viabilidade-financeira)
@@ -48,7 +48,7 @@
 
 O **Sweezy AI** e uma solucao autonoma distribuida em Python projetada para transformar o processo de prospeccao ativa B2B no Brasil, com foco direcionado a software houses, adquirentes, gateways, fintechs e consultorias comerciais.
 
-O agente automatiza a identificacao de estabelecimentos comerciais fisicos em qualquer poligono urbano nacional, valida sua legitimidade juridica nas bases da Receita Federal, audita sua infraestrutura digital e calcula a probabilidade de fechamento contratual para modernizacao de PDV e gestao.
+O agente automatiza a identificacao de estabelecimentos comerciais fisicos em qualquer poligono urbano nacional, valida sua legitimidade juridica nas bases da Receita Federal, audita sua infraestrutura digital e calcula a probabilidade de fechamento contratual para modernizacao de PDV e gestao, **operando com custo ZERO absoluto (R$ 0,00)**.
 
 ```text
 +-------------------------------------------------------------------------------+
@@ -69,8 +69,8 @@ O agente automatiza a identificacao de estabelecimentos comerciais fisicos em qu
 |               +-----------------------------------------------------+         |
 |               v                                                               |
 |   +-----------------------+     +-----------------------+    +------------+   |
-|   | Auditoria Heuristica  | --> | LLM Cognitive Scoring | -> | SQLite WAL |   |
-|   | (50+ Assinaturas PDV) |     | (GPT-4o-mini + Pitch) |    | & Rich CLI |   |
+|   | Auditoria Heuristica  | --> | Motor Qualificador    | -> | SQLite WAL |   |
+|   | (50+ Assinaturas PDV) |     | (Score + Pitch Local) |    | & Rich CLI |   |
 |   +-----------------------+     +-----------------------+    +------------+   |
 +-------------------------------------------------------------------------------+
 ```
@@ -114,14 +114,14 @@ graph TD
         SignatureEngine --> POSStatus
     end
 
-    subgraph Camada_Cognitiva [4. Qualificacao Cognitiva e Decisao]
-        PromptEngine[Engenharia de Prompt Especializada B2B]
-        LLM[OpenAI GPT-4o-mini - Structured Outputs]
-        ScoreEngine[Score 0-100 + Dores de Negocio + Pitch WhatsApp]
+    subgraph Camada_Qualificacao [4. Qualificacao Deterministica Local]
+        RulesEngine[Motor de Regras e Ponderacao Fiscal]
+        PitchGenerator[Gerador Dinamico de Pitch WhatsApp em pt-BR]
+        ScoreEngine[Score 0-100 + Sinais Operacionais + Canal Recomendado]
         
-        POSStatus --> PromptEngine
-        PromptEngine --> LLM
-        LLM --> ScoreEngine
+        POSStatus --> RulesEngine
+        RulesEngine --> PitchGenerator
+        PitchGenerator --> ScoreEngine
     end
 
     subgraph Camada_Persistencia [5. Persistencia e Acao Comercial]
@@ -137,20 +137,20 @@ graph TD
     classDef discoveryBox fill:#0b132b,stroke:#2dd4bf,stroke-width:2px,color:#ffffff;
     classDef enrichBox fill:#1c2541,stroke:#3b82f6,stroke-width:2px,color:#ffffff;
     classDef auditBox fill:#1e293b,stroke:#f59e0b,stroke-width:2px,color:#ffffff;
-    classDef cogBox fill:#145a32,stroke:#10b981,stroke-width:2px,color:#ffffff;
+    classDef qualBox fill:#145a32,stroke:#10b981,stroke-width:2px,color:#ffffff;
     classDef persBox fill:#2c3e50,stroke:#95a5a6,stroke-width:2px,color:#ffffff;
 
     class Camada_Descoberta discoveryBox;
     class Camada_Enriquecimento enrichBox;
     class Camada_Auditoria auditBox;
-    class Camada_Cognitiva cogBox;
+    class Camada_Qualificacao qualBox;
     class Camada_Persistencia persBox;
 ```
 
 ### Pilares Arquiteturais:
-1. **Filtro Estrito Anti-Fantasias:** Exclusao automatica de termos ficticios, marcas genericas e correspondencias inconsistentes, preservando apenas empresas reais e ativas.
-2. **Decomposicao em Malha:** Divisao circular de raios urbanos para ultrapassar o teto padrao de 60 estabelecimentos por busca do Google Places sem duplicar cobranca.
-3. **Structured Outputs com Pydantic:** Todas as analises cognitivas do LLM seguem esquemas estritos, evitando alucinacoes e garantindo integracao direta no banco de dados.
+1. **Custo Zero e Autonomia:** Toda a etapa de qualificacao e geracao de roteiro roda localmente sem cobrar tokens nem depender de APIs de terceiros.
+2. **Filtro Estrito Anti-Fantasias:** Exclusao automatica de termos ficticios, marcas genericas e correspondencias inconsistentes, preservando apenas empresas reais e ativas.
+3. **Decomposicao em Malha:** Divisao circular de raios urbanos para ultrapassar o teto padrao de 60 estabelecimentos por busca do Google Places sem duplicar cobranca.
 
 ---
 
@@ -163,7 +163,7 @@ graph TD
 | **Receita Federal / QSA**| `discovery/receita_federal.py`| BrasilAPI REST v2 | Levantamento de CNPJ, Razao Social, Situacao Cadastral, Capital Social, CNAE primario/secundarios e quadro societario completo. |
 | **Heuristic POS Engine** | `analysis/pos_detector.py` | RegEx compiladas e parsers DOM | Inspecao de 50+ solucoes de software (Totvs, Linx, Bematech, Omie, ContaAzul, Bling, Hiper, Saipos, PDVSeven, etc.). |
 | **Web Scraper Assincrono**| `analysis/web_scraper.py` | `httpx` + `lxml` + `BeautifulSoup4`| Coleta concorrente de landing pages, rodapes, scripts integrados, canais de pedidos e plataformas de delivery. |
-| **Qualificador Cognitivo**| `analysis/llm_qualifier.py` | OpenAI API (GPT-4o-mini) | Calculo parametrizado de propensao a compra (0-100), diagnostico consultivo e script de abordagem via WhatsApp. |
+| **Qualificador Local**   | `analysis/llm_qualifier.py` | Motor de regras Pydantic v2 | Calculo parametrizado de propensao a compra (0-100), diagnostico comercial e script de abordagem via WhatsApp com nome do socio. |
 | **Engine de Persistencia**| `core/database.py`, `core/models.py`| SQLite3 WAL Engine | Persistencia em alta performance, indices otimizados, transacoes atomicas e isolamento total. |
 | **Interface Operacional**| `cli.py` | `rich` (Tabelas, Painel, Console) | Dashboard interativo de terminal com status de progresso, ordenacao por pontuacao e exportacao de dados. |
 
@@ -237,16 +237,16 @@ O agente realiza uma auditoria em profundidade na presenca web do estabeleciment
 
 ---
 
-## 7. Qualificacao Cognitiva e Modelo de Scoring
+## 7. Qualificacao Deterministica e Modelo de Scoring
 
-A qualificacao utiliza **OpenAI GPT-4o-mini** com saidas estritas (*Structured Outputs*), ponderando:
+A qualificacao e realizada por um motor deterministico em Python de altissima velocidade e precisao:
 
 ```text
 Score Final = (Ausencia_PDV * 0.40) + (Porte_Empresa * 0.25) + (Presenca_Digital * 0.20) + (Tempo_Atividade * 0.15)
 ```
 
 ### Niveis de Classificacao:
-- **Score 80 a 100 (Alta Prioridade):** Empresa ativa, sem PDV moderno detectado, contato direto com socio identificado no QSA.
+- **Score 80 a 100 (Alta Prioridade):** Empresa ativa, sem PDV moderno detectado, presenca de operacao manual (cardapio em PDF, pedidos por WhatsApp ou Pix CPF). Gancho de vendas gerado automaticamente com o nome do socio administrador (QSA).
 - **Score 50 a 79 (Media Prioridade):** Empresa com sistema legado ou necessidade pontual de integracao fiscal.
 - **Score < 50 (Baixa Prioridade):** Ja possui ERP de grande porte ou informacoes comerciais insuficientes.
 
@@ -278,15 +278,15 @@ sweezy-ai/
 │   ├── grid_scanner.py       # Algoritmo de malha circular para cobertura ampla
 │   └── receita_federal.py    # Consulta de CNPJ e quadro de socios via BrasilAPI
 │
-├── analysis/                 # Inteligencia tecnica e cognitiva
+├── analysis/                 # Inteligencia tecnica e qualificacao
 │   ├── __init__.py
 │   ├── pos_detector.py       # Motor heuristico com 50+ assinaturas de PDV
 │   ├── web_scraper.py        # Coletor assincrono de paginas e metadados
-│   └── llm_qualifier.py      # Qualificador cognitivo baseado em GPT-4o-mini
+│   └── llm_qualifier.py      # Qualificador local com gerador de roteiro comercial
 │
 ├── pipeline/                 # Orquestracao do fluxo de ponta a ponta
 │   ├── __init__.py
-│   └── lead_pipeline.py      # Pipeline unificado: Busca -> Dados -> Heuristica -> IA
+│   └── lead_pipeline.py      # Pipeline unificado: Busca -> Dados -> Heuristica -> Qualificacao
 │
 ├── docs/                     # Manuais tecnicos detalhados
 │   ├── api_integrations.md   # Especificacao detalhada de APIs consumidas
@@ -310,7 +310,7 @@ sweezy-ai/
 ### Pre-requisitos:
 - **Python 3.12** ou superior instalado
 - Git instalado
-- Chaves de API ativas (Google Cloud e OpenAI)
+- Chave de API da Google Places (coberta pelo credito gratuito mensal de $200 USD do Google Cloud)
 
 ### Passo a Passo:
 
@@ -335,22 +335,17 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Edite o arquivo `.env` com suas credenciais:
+Edite o arquivo `.env` com sua chave do Google Places:
 
 ```ini
 ENVIRONMENT=development
 LOG_LEVEL=INFO
 
 # Google Places API (New)
-GOOGLE_PLACES_API_KEY=AIzaSy...
-
-# OpenAI API
-OPENAI_API_KEY=sk-proj-...
-OPENAI_MODEL_NAME=gpt-4o-mini
+GOOGLE_API_KEY=AIzaSy...
 
 # Persistencia Local
-DATABASE_URL=sqlite:///data/sweezy.db
-DATABASE_DIR=./data
+DATABASE_URL=sqlite:///./data/sweezy.db
 
 # Scraper
 SCRAPER_TIMEOUT_SECONDS=10
@@ -381,21 +376,21 @@ python cli.py view-lead --id 1
 
 ```text
 [Consulta SQLite WAL Local]      =========> 0.8ms
+[Qualificacao Local em Python]   ===========> 1.2ms
 [Validacao BrasilAPI / Receita]  =============> 280ms
 [Scraping Assincrono por Site]   ===================> 750ms
-[Qualificacao GPT-4o-mini]       ========================> 1100ms
-[Pipeline Completo por Lead]     =============================> ~2.2s
+[Pipeline Completo por Lead]     =========================> ~1.1s
 ```
 
 ### Projecao de Custo Operacional por 1.000 Leads:
 
-| Servico / API | Modelo Tarifario | Custo por 1.000 Leads |
-| :--- | :--- | :--- |
-| **Google Places API (New)** | Requisicoes otimizadas | **R$ 0,00** (coberto pelo free tier mensal de $200 USD) |
-| **BrasilAPI / Receita Federal** | Open-source Comunitario | **R$ 0,00** (totalmente gratuito) |
-| **OpenAI GPT-4o-mini** | Structured Outputs (~700 tokens) | **~R$ 1,20 a R$ 1,60** |
-| **Persistencia SQLite WAL** | Local e Concorrente | **R$ 0,00** (zero custo de infraestrutura externa) |
-| **Custo Total Estimado** | Pipeline ponta a ponta | **~R$ 1,50 a cada 1.000 Leads** |
+| Servico / Componente | Modelo Tarifario | Custo por 1.000 Leads | Observacoes |
+| :--- | :--- | :---: | :--- |
+| **Google Places API (New)** | Requisicoes otimizadas | **R$ 0,00** | Coberto pelo credito mensal gratuito de $200 USD do Google Cloud |
+| **BrasilAPI / Receita Federal** | Open-source Comunitario | **R$ 0,00** | Totalmente gratuito e aberto |
+| **Motor de Qualificacao Local** | Algoritmo Deterministico em Python | **R$ 0,00** | Sem APIs pagas de IA, sem consumo de tokens |
+| **Persistencia SQLite WAL** | Local e Concorrente | **R$ 0,00** | Zero custo de servidores ou infraestrutura externa |
+| **Custo Total Estimado** | Pipeline ponta a ponta | **R$ 0,00** | **Operacao 100% gratuita** |
 
 ---
 
