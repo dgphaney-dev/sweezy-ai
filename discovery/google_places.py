@@ -680,7 +680,7 @@ class GooglePlacesClient:
         self,
         api_key: str | None = None,
         dry_run: bool = False,
-        requests_per_second: float = 5.0,
+        requests_per_second: float = 2.0,
         timeout: float = 12.0,
     ) -> None:
         """Inicializa o cliente do Google Places API (New).
@@ -810,35 +810,40 @@ class GooglePlacesClient:
             payload["includedTypes"] = valid_types
 
         client = await self._get_client()
-        try:
-            response = await client.post(url, headers=headers, json=payload)
-            if response.status_code == 429:
-                logger.warning("Limite de cota (HTTP 429) na Places API. Retentando...")
-                response.raise_for_status()
-
-            if response.status_code == 400 and "includedTypes" in payload:
-                logger.warning(
-                    f"Places API recusou tipos {payload.get('includedTypes')}. Re-executando busca ampla sem filtro restritivo de tipo..."
-                )
-                payload.pop("includedTypes", None)
+        for attempt in range(1, 4):
+            try:
                 response = await client.post(url, headers=headers, json=payload)
+                if response.status_code == 429:
+                    wait_secs = 2.0 * attempt
+                    logger.warning(
+                        f"Limite de taxa temporário (HTTP 429) no Google Places. Aguardando {wait_secs:.1f}s (tentativa {attempt}/3)..."
+                    )
+                    await asyncio.sleep(wait_secs)
+                    continue
 
-            if response.status_code != 200:
-                logger.error(
-                    f"Erro na Places API Nearby Search ({response.status_code}): {response.text}"
-                )
-                response.raise_for_status()
+                if response.status_code == 400 and "includedTypes" in payload:
+                    logger.warning(
+                        f"Places API recusou tipos {payload.get('includedTypes')}. Re-executando busca ampla sem filtro restritivo de tipo..."
+                    )
+                    payload.pop("includedTypes", None)
+                    response = await client.post(url, headers=headers, json=payload)
 
-            data = response.json()
-            raw_places = data.get("places", [])
-            return [PlaceResult.from_api_dict(p) for p in raw_places if isinstance(p, dict)]
+                if response.status_code == 200:
+                    data = response.json()
+                    raw_places = data.get("places", [])
+                    return [PlaceResult.from_api_dict(p) for p in raw_places if isinstance(p, dict)]
 
-        except httpx.HTTPStatusError as e:
-            logger.error(f"Falha de status HTTP na busca por proximidade: {e.response.status_code}")
-            raise
-        except Exception as e:
-            logger.error(f"Exceção inesperada na busca Nearby Search: {e}")
-            raise
+                if response.status_code != 200:
+                    logger.error(
+                        f"Erro na Places API Nearby Search ({response.status_code}): {response.text}"
+                    )
+                    break
+            except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.NetworkError) as err:
+                if attempt == 3:
+                    raise
+                await asyncio.sleep(1.5 * attempt)
+
+        return []
 
     # --------------------------------------------------------------------------
     # 2. Text Search (places:searchText)

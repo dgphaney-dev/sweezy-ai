@@ -425,6 +425,9 @@ class LeadPipeline:
                     logger.warning(err_msg)
                     errors.append(err_msg)
 
+                # Intervalo preventivo contra limites de taxa da API (QPS)
+                await asyncio.sleep(0.35)
+
                 if max_places and len(raw_places_collected) >= max_places:
                     raw_places_collected = raw_places_collected[:max_places]
                     break
@@ -435,15 +438,21 @@ class LeadPipeline:
             await self._emit_progress(progress_callback, progress)
 
             places_to_process: list[PlaceResult] = []
+            already_cataloged: list[Lead] = []
             for p in raw_places_collected:
                 existing_lead = await get_lead_by_place_id(p.place_id)
                 if not existing_lead:
                     places_to_process.append(p)
+                else:
+                    already_cataloged.append(existing_lead)
 
             progress.stage = PipelineStage.ENRICHMENT
-            progress.total_steps = len(places_to_process)
+            progress.total_steps = len(places_to_process) if places_to_process else len(already_cataloged)
             progress.current_step = 0
-            progress.message = f"Iniciando enriquecimento de {len(places_to_process)} locais..."
+            if places_to_process:
+                progress.message = f"Iniciando enriquecimento de {len(places_to_process)} novos locais..."
+            else:
+                progress.message = f"Todos os {len(already_cataloged)} locais já se encontram catalogados no banco."
             await self._emit_progress(progress_callback, progress)
 
             persisted_leads: list[Lead] = []
@@ -483,6 +492,9 @@ class LeadPipeline:
                     persisted_leads.append(res)
                 elif isinstance(res, Exception):
                     errors.append(f"Erro em tarefa concorrente: {res}")
+
+            if not persisted_leads and already_cataloged:
+                persisted_leads = already_cataloged
 
             duration = round(time.time() - start_time, 2)
             high_count = sum(1 for l in persisted_leads if l.qualification and l.qualification.likelihood_no_pos == LikelihoodLevel.HIGH)
