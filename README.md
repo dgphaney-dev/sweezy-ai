@@ -352,20 +352,27 @@ SCRAPER_TIMEOUT_SECONDS=10
 SCRAPER_MAX_CONCURRENT_REQUESTS=10
 ```
 
-### Comandos da CLI:
+### Executando o Aplicativo Desktop (Interface Grafica):
 
 ```bash
-# Iniciar varredura geografica completa
-python cli.py scan --query "restaurantes" --lat -19.9167 --lng -43.9345 --radius 3000
+# Iniciar a Interface Desktop Nativa (Flet)
+python app.py
+```
+
+### Comandos da CLI (Terminal):
+
+```bash
+# Iniciar varredura geografica completa por Cidade e UF
+python cli.py scan "Curitiba, PR" --tipo "restaurante"
 
 # Visualizar tabela de leads qualificados
 python cli.py list-leads
 
 # Exportar leads para arquivo CSV
-python cli.py export-leads --output leads_qualificados.csv
+python cli.py export --output leads_qualificados.csv
 
-# Inspecionar detalhes de um lead por ID
-python cli.py view-lead --id 1
+# Exibir estatisticas consolidadas do funil
+python cli.py stats
 ```
 
 ---
