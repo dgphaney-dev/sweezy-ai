@@ -22,25 +22,30 @@ class Header(ft.Container):
     def __init__(self, on_tab_change: Callable[[int], None]) -> None:
         self.on_tab_change = on_tab_change
 
-        self.tabs = ft.Tabs(
-            selected_index=0,
-            animation_duration=200,
+        self.tab_bar = ft.TabBar(
             indicator_color=ACCENT_CYAN,
             label_color=ACCENT_CYAN,
             unselected_label_color=TEXT_MUTED,
-            on_change=lambda e: self.on_tab_change(int(e.control.selected_index)),
             tabs=[
-                ft.Tab(text="Nova Varredura", icon=ft.Icons.SEARCH),
-                ft.Tab(text="Leads Qualificados", icon=ft.Icons.PEOPLE_ALT_OUTLINED),
-                ft.Tab(text="Estatísticas", icon=ft.Icons.INSIGHTS),
-                ft.Tab(text="Configurações", icon=ft.Icons.SETTINGS_OUTLINED),
+                ft.Tab(label="Nova Varredura", icon=ft.Icons.SEARCH),
+                ft.Tab(label="Leads Qualificados", icon=ft.Icons.PEOPLE_ALT_OUTLINED),
+                ft.Tab(label="Estatísticas", icon=ft.Icons.INSIGHTS),
+                ft.Tab(label="Configurações", icon=ft.Icons.SETTINGS_OUTLINED),
             ],
+        )
+
+        self.tabs = ft.Tabs(
+            length=4,
+            selected_index=0,
+            animation_duration=200,
+            on_change=lambda e: self.on_tab_change(int(e.control.selected_index)),
+            content=self.tab_bar,
         )
 
         super().__init__(
             bgcolor=BG_SURFACE,
-            padding=ft.padding.symmetric(horizontal=24, vertical=12),
-            border=ft.border.only(bottom=ft.BorderSide(1, BORDER_COLOR)),
+            padding=ft.Padding.symmetric(horizontal=24, vertical=12),
+            border=ft.Border.only(bottom=ft.BorderSide(1, BORDER_COLOR)),
             content=ft.Row(
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
@@ -69,9 +74,9 @@ class Header(ft.Container):
                             ),
                             ft.Container(
                                 bgcolor=BG_CARD,
-                                padding=ft.padding.symmetric(horizontal=10, vertical=4),
+                                padding=ft.Padding.symmetric(horizontal=10, vertical=4),
                                 border_radius=6,
-                                border=ft.border.all(1, BORDER_COLOR),
+                                border=ft.Border.all(1, BORDER_COLOR),
                                 content=ft.Row(
                                     spacing=6,
                                     controls=[

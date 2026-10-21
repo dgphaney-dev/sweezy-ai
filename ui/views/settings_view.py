@@ -65,7 +65,7 @@ class SettingsView(ft.Container):
                         bgcolor=BG_SURFACE,
                         padding=20,
                         border_radius=8,
-                        border=ft.border.all(1, BORDER_COLOR),
+                        border=ft.Border.all(1, BORDER_COLOR),
                         content=ft.Column(
                             spacing=12,
                             controls=[
@@ -75,7 +75,7 @@ class SettingsView(ft.Container):
                                         ft.Text("Google Cloud Places API (New)", size=15, weight=ft.FontWeight.BOLD, color=TEXT_PRIMARY),
                                         ft.Container(
                                             bgcolor=BG_CARD,
-                                            padding=ft.padding.symmetric(horizontal=10, vertical=4),
+                                            padding=ft.Padding.symmetric(horizontal=10, vertical=4),
                                             border_radius=4,
                                             content=ft.Row(
                                                 spacing=6,
@@ -97,7 +97,7 @@ class SettingsView(ft.Container):
                                     controls=[
                                         self.key_input,
                                         ft.FilledButton(
-                                            text="Salvar Chave",
+                                            content="Salvar Chave",
                                             icon=ft.Icons.SAVE,
                                             style=ft.ButtonStyle(bgcolor=ACCENT_CYAN, color=BG_SURFACE),
                                             on_click=self._save_key_clicked,
@@ -112,7 +112,7 @@ class SettingsView(ft.Container):
                         bgcolor=BG_SURFACE,
                         padding=20,
                         border_radius=8,
-                        border=ft.border.all(1, BORDER_COLOR),
+                        border=ft.Border.all(1, BORDER_COLOR),
                         content=ft.Column(
                             spacing=12,
                             controls=[
@@ -151,7 +151,7 @@ class SettingsView(ft.Container):
                         bgcolor=BG_SURFACE,
                         padding=20,
                         border_radius=8,
-                        border=ft.border.all(1, BORDER_COLOR),
+                        border=ft.Border.all(1, BORDER_COLOR),
                         content=ft.Column(
                             spacing=10,
                             controls=[
@@ -194,10 +194,13 @@ class SettingsView(ft.Container):
         env_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
         os.environ["GOOGLE_API_KEY"] = new_key
 
-        e.page.show_snack_bar(
-            ft.SnackBar(
-                content=ft.Text("Chave da Google Places API salva com sucesso no .env!"),
-                bgcolor=BG_SURFACE,
-                duration=3000,
+        try:
+            e.page.show_dialog(
+                ft.SnackBar(
+                    content=ft.Text("Chave da Google Places API salva com sucesso no .env!"),
+                    bgcolor=BG_SURFACE,
+                    duration=3000,
+                )
             )
-        )
+        except Exception:
+            pass

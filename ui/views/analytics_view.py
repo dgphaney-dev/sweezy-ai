@@ -62,7 +62,7 @@ class AnalyticsView(ft.Container):
                         bgcolor=BG_SURFACE,
                         padding=20,
                         border_radius=8,
-                        border=ft.border.all(1, BORDER_COLOR),
+                        border=ft.Border.all(1, BORDER_COLOR),
                         content=ft.Column(
                             spacing=14,
                             controls=[
@@ -82,7 +82,7 @@ class AnalyticsView(ft.Container):
             bgcolor=BG_CARD,
             padding=18,
             border_radius=8,
-            border=ft.border.all(1, BORDER_COLOR),
+            border=ft.Border.all(1, BORDER_COLOR),
             content=ft.Column(
                 spacing=8,
                 controls=[

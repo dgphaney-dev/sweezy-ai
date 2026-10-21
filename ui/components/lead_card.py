@@ -90,7 +90,7 @@ class LeadCard(ft.Container):
             bgcolor=BG_CARD,
             padding=16,
             border_radius=8,
-            border=ft.border.all(1, BORDER_COLOR),
+            border=ft.Border.all(1, BORDER_COLOR),
             content=ft.Column(
                 spacing=12,
                 controls=[
@@ -110,16 +110,16 @@ class LeadCard(ft.Container):
                                     ),
                                     ft.Container(
                                         bgcolor=BG_SURFACE,
-                                        padding=ft.padding.symmetric(horizontal=8, vertical=2),
+                                        padding=ft.Padding.symmetric(horizontal=8, vertical=2),
                                         border_radius=4,
-                                        border=ft.border.all(1, prio_color),
+                                        border=ft.Border.all(1, prio_color),
                                         content=ft.Text(prio_str, size=10, weight=ft.FontWeight.BOLD, color=prio_color),
                                     ),
                                     ft.Container(
                                         bgcolor=BG_SURFACE,
-                                        padding=ft.padding.symmetric(horizontal=8, vertical=2),
+                                        padding=ft.Padding.symmetric(horizontal=8, vertical=2),
                                         border_radius=4,
-                                        border=ft.border.all(1, pdv_color),
+                                        border=ft.Border.all(1, pdv_color),
                                         content=ft.Text(pdv_badge, size=10, weight=ft.FontWeight.W_600, color=pdv_color),
                                     ),
                                 ],
@@ -188,7 +188,7 @@ class LeadCard(ft.Container):
                         bgcolor=BG_SURFACE,
                         padding=12,
                         border_radius=6,
-                        border=ft.border.all(1, BORDER_COLOR),
+                        border=ft.Border.all(1, BORDER_COLOR),
                         content=ft.Column(
                             spacing=4,
                             controls=[
@@ -203,20 +203,20 @@ class LeadCard(ft.Container):
                         spacing=10,
                         controls=[
                             ft.OutlinedButton(
-                                text="Copiar Pitch",
+                                content="Copiar Pitch",
                                 icon=ft.Icons.COPY_ALL,
                                 style=ft.ButtonStyle(color=TEXT_PRIMARY),
-                                on_click=lambda e: self._copy_pitch(e, commercial_hook),
+                                on_click=lambda e: self._copy_pitch_clicked(e, commercial_hook),
                             ),
                             ft.OutlinedButton(
-                                text="Ver no Maps",
+                                content="Ver no Maps",
                                 icon=ft.Icons.MAP_OUTLINED,
                                 style=ft.ButtonStyle(color=TEXT_SECONDARY),
                                 url=maps_url,
                                 visible=bool(maps_url),
                             ),
                             ft.FilledButton(
-                                text="Abrir WhatsApp",
+                                content="Abrir WhatsApp",
                                 icon=ft.Icons.CHAT,
                                 style=ft.ButtonStyle(bgcolor=ACCENT_GREEN, color=TEXT_PRIMARY),
                                 url=wa_url,
@@ -228,13 +228,28 @@ class LeadCard(ft.Container):
             ),
         )
 
-    def _copy_pitch(self, e: Any, text: str) -> None:
+    def _copy_pitch_clicked(self, e: Any, text: str) -> None:
         """Copia o pitch para a area de transferencia e emite notificacao."""
-        e.page.set_clipboard(text)
-        e.page.show_snack_bar(
-            ft.SnackBar(
-                content=ft.Text("Pitch de abordagem copiado para a área de transferência!"),
-                bgcolor=BG_SURFACE,
-                duration=2500,
+        import subprocess
+        import sys
+
+        try:
+            if sys.platform == "win32":
+                subprocess.run(["clip"], input=text.encode("utf-16"), check=True)
+            elif sys.platform == "darwin":
+                subprocess.run(["pbcopy"], input=text.encode("utf-8"), check=True)
+            else:
+                subprocess.run(["xclip", "-selection", "clipboard"], input=text.encode("utf-8"), check=True)
+        except Exception:
+            pass
+
+        try:
+            e.page.show_dialog(
+                ft.SnackBar(
+                    content=ft.Text("Pitch de abordagem copiado para a área de transferência!"),
+                    bgcolor=BG_SURFACE,
+                    duration=2500,
+                )
             )
-        )
+        except Exception:
+            pass

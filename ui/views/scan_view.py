@@ -92,7 +92,7 @@ class ScanView(ft.Container):
 
         # Botao de Inicio
         self.btn_iniciar = ft.FilledButton(
-            text="Iniciar Prospecção",
+            content="Iniciar Prospecção",
             icon=ft.Icons.ROCKET_LAUNCH,
             style=ft.ButtonStyle(bgcolor=ACCENT_CYAN, color=BG_SURFACE),
             height=48,
@@ -136,7 +136,7 @@ class ScanView(ft.Container):
                         bgcolor=BG_SURFACE,
                         padding=18,
                         border_radius=8,
-                        border=ft.border.all(1, BORDER_COLOR),
+                        border=ft.Border.all(1, BORDER_COLOR),
                         content=ft.Column(
                             spacing=14,
                             controls=[
@@ -166,7 +166,7 @@ class ScanView(ft.Container):
                         bgcolor=BG_SURFACE,
                         padding=16,
                         border_radius=8,
-                        border=ft.border.all(1, BORDER_COLOR),
+                        border=ft.Border.all(1, BORDER_COLOR),
                         content=ft.Column(
                             spacing=8,
                             controls=[
@@ -185,7 +185,7 @@ class ScanView(ft.Container):
                         bgcolor=BG_CARD,
                         padding=12,
                         border_radius=8,
-                        border=ft.border.all(1, BORDER_COLOR),
+                        border=ft.Border.all(1, BORDER_COLOR),
                         content=self.log_list,
                     ),
                 ],

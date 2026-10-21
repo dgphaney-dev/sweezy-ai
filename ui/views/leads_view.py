@@ -41,7 +41,7 @@ class LeadsView(ft.Container):
 
         self.current_filter = "ALL"
         self.btn_export = ft.OutlinedButton(
-            text="Exportar CSV",
+            content="Exportar CSV",
             icon=ft.Icons.DOWNLOAD,
             style=ft.ButtonStyle(color=ACCENT_CYAN),
             on_click=self._export_csv_clicked,
@@ -71,7 +71,7 @@ class LeadsView(ft.Container):
         self.leads_list = ft.ListView(
             expand=True,
             spacing=12,
-            padding=ft.padding.only(right=10),
+            padding=ft.Padding.only(right=10),
         )
 
         super().__init__(
@@ -104,7 +104,7 @@ class LeadsView(ft.Container):
                         bgcolor=BG_SURFACE,
                         padding=12,
                         border_radius=8,
-                        border=ft.border.all(1, BORDER_COLOR),
+                        border=ft.Border.all(1, BORDER_COLOR),
                         content=ft.Column(
                             spacing=10,
                             controls=[
@@ -125,10 +125,10 @@ class LeadsView(ft.Container):
     def _build_filter_chip(self, label: str, value: str, color: str, is_active: bool = False) -> ft.Container:
         """Cria um botao de filtro estilisado."""
         return ft.Container(
-            padding=ft.padding.symmetric(horizontal=12, vertical=6),
+            padding=ft.Padding.symmetric(horizontal=12, vertical=6),
             border_radius=6,
             bgcolor=BG_CARD if not is_active else BG_SURFACE,
-            border=ft.border.all(1, color if is_active else BORDER_COLOR),
+            border=ft.Border.all(1, color if is_active else BORDER_COLOR),
             ink=True,
             on_click=lambda e: self._on_filter_clicked(value),
             content=ft.Text(label, size=12, weight=ft.FontWeight.W_600 if is_active else ft.FontWeight.NORMAL, color=color if is_active else TEXT_SECONDARY),
@@ -145,7 +145,7 @@ class LeadsView(ft.Container):
                 or (filter_value == "MEDIUM" and "Média" in chip_label)
                 or (filter_value == "LOW" and "Baixa" in chip_label)
             )
-            chip.border = ft.border.all(1, ACCENT_CYAN if is_active else BORDER_COLOR)
+            chip.border = ft.Border.all(1, ACCENT_CYAN if is_active else BORDER_COLOR)
             chip.content.color = ACCENT_CYAN if is_active else TEXT_SECONDARY
             chip.content.weight = ft.FontWeight.W_600 if is_active else ft.FontWeight.NORMAL
 
@@ -183,7 +183,7 @@ class LeadsView(ft.Container):
             self.leads_list.controls.append(
                 ft.Container(
                     padding=40,
-                    alignment=ft.alignment.center,
+                    alignment=ft.Alignment.CENTER,
                     content=ft.Column(
                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                         spacing=8,
@@ -221,10 +221,13 @@ class LeadsView(ft.Container):
             loop.close()
 
         full_path = os.path.abspath(out_name)
-        e.page.show_snack_bar(
-            ft.SnackBar(
-                content=ft.Text(f"{total} leads exportados com sucesso para: {out_name}"),
-                bgcolor=BG_SURFACE,
-                duration=3500,
+        try:
+            e.page.show_dialog(
+                ft.SnackBar(
+                    content=ft.Text(f"{total} leads exportados com sucesso para: {out_name}"),
+                    bgcolor=BG_SURFACE,
+                    duration=3500,
+                )
             )
-        )
+        except Exception:
+            pass
