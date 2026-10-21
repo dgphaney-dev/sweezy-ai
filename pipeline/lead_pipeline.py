@@ -137,8 +137,13 @@ class LeadPipeline:
         concurrency_limit: int = 5,
     ) -> None:
         self.settings = settings or get_settings()
+        use_osm = (
+            getattr(self.settings, "places_provider", "").lower() == "osm"
+            or not self.settings.google_api_key
+        )
         self.places_client = places_client or GooglePlacesClient(
-            api_key=self.settings.google_api_key,
+            api_key="" if use_osm else self.settings.google_api_key,
+            dry_run=use_osm,
             requests_per_second=float(self.settings.google_requests_per_second),
             timeout=self.settings.http_timeout_seconds,
         )

@@ -23,6 +23,11 @@ class Settings(BaseSettings):
         alias="GOOGLE_API_KEY",
         description="Chave da Google Cloud restrita à Places API (New) para descoberta.",
     )
+    places_provider: str = Field(
+        default="osm",
+        alias="PLACES_PROVIDER",
+        description="Provedor de descoberta geográfica ('osm' para OpenStreetMap gratuito, 'google' para Google Places).",
+    )
 
     # --------------------------------------------------------------------------
     # OpenAI API & LLM

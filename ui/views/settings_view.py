@@ -59,7 +59,7 @@ class SettingsView(ft.Container):
                             ft.Text("Credenciais de busca, integridade de banco de dados e parametros operacionais", size=13, color=TEXT_MUTED),
                         ],
                     ),
-                    # Secao: Google Places API
+                    # Secao: Provedor Geografico
                     ft.Container(
                         bgcolor=BG_SURFACE,
                         padding=20,
@@ -71,7 +71,7 @@ class SettingsView(ft.Container):
                                 ft.Row(
                                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                                     controls=[
-                                        ft.Text("Google Cloud Places API (New)", size=15, weight=ft.FontWeight.BOLD, color=TEXT_PRIMARY),
+                                        ft.Text("Provedor Geográfico: OpenStreetMap (OSM)", size=15, weight=ft.FontWeight.BOLD, color=TEXT_PRIMARY),
                                         ft.Container(
                                             bgcolor=BG_CARD,
                                             padding=ft.Padding.symmetric(horizontal=10, vertical=4),
@@ -79,18 +79,20 @@ class SettingsView(ft.Container):
                                             content=ft.Row(
                                                 spacing=6,
                                                 controls=[
-                                                    ft.Container(width=7, height=7, border_radius=4, bgcolor=ACCENT_GREEN if len(env_key) > 10 else ACCENT_RED),
-                                                    ft.Text("Chave Ativa" if len(env_key) > 10 else "Chave Ausente", size=11, color=TEXT_PRIMARY),
+                                                    ft.Container(width=7, height=7, border_radius=4, bgcolor=ACCENT_GREEN),
+                                                    ft.Text("Ativo (100% Gratuito - R$ 0,00)", size=11, color=TEXT_PRIMARY),
                                                 ],
                                             ),
                                         ),
                                     ],
                                 ),
                                 ft.Text(
-                                    "A chave é utilizada para o mapeamento geográfico de estabelecimentos. O Google Cloud oferece $200 de crédito gratuito todo mês.",
+                                    "O motor OpenStreetMap / Nominatim busca estabelecimentos reais de rua, padarias, oficinas, farmácias e mercados de qualquer cidade brasileira sem consumir cotas, sem chave e sem cartão de crédito.",
                                     size=12,
                                     color=TEXT_SECONDARY,
                                 ),
+                                ft.Divider(color=BORDER_COLOR, height=1),
+                                ft.Text("Chave Opcional: Google Cloud Places API (New)", size=13, weight=ft.FontWeight.W_600, color=TEXT_PRIMARY),
                                 ft.Row(
                                     spacing=10,
                                     controls=[
