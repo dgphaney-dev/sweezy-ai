@@ -1,357 +1,329 @@
-# Sweezy AI — Agente de Prospeccao Inteligente
+<div align="center">
 
-> **Plataforma autonoma em Python para descoberta geografica, enriquecimento cadastral na Receita Federal, deteccao de maturidade tecnologica (PDV/ERP) e qualificacao cognitiva de leads B2B com Inteligencia Artificial.**
+# Sweezy AI
 
----
+### Agente Autonomo de Descoberta Geografica, Enriquecimento Cadastral e Qualificacao B2B
 
-[![Python Version](https://img.shields.io/badge/python-3.12%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Code Style: Black / PEP8](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Python Version](https://img.shields.io/badge/Python-3.12%2B-2b5b84?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-4183c4?style=flat-square)](LICENSE)
+[![Architecture: Clean](https://img.shields.io/badge/Architecture-Async_Modular-1b365d?style=flat-square)](#arquitetura-do-sistema)
+[![Testing: Pytest](https://img.shields.io/badge/Tests-25%20Passed%20(100%25)-2ea44f?style=flat-square&logo=pytest&logoColor=white)](#testes-automatizados)
+[![Code Style: Black](https://img.shields.io/badge/Code%20Style-Black-000000?style=flat-square)](https://github.com/psf/black)
 
----
-
-## O que e o Sweezy AI?
-
-O **Sweezy AI** e um agente autonomo desenhado especificamente para o mercado B2B brasileiro (software houses, empresas de PDV/ERP, fintechs, gateways de pagamento e consultorias comerciais).
-
-O agente resolve o gargalo mais caro de uma operacao de vendas: **encontrar estabelecimentos comerciais reais que ainda nao possuem um software de gestao ou ponto de venda moderno (PDV/ERP)** e estao prontos para receber uma proposta de digitalizacao.
-
-### Como o agente trabalha:
-1. **Mapeia** uma regiao geografica definida (cidade, bairro ou raio) em busca de nichos-alvo reais (restaurantes, mercados, autopecas, clinicas, vestuario, servicos).
-2. **Identifica** a empresa legalmente atraves do cruzamento com bases publicas da Receita Federal via **BrasilAPI**, levantando CNPJ, CNAE, porte e socios (QSA).
-3. **Audita** a presenca digital do negocio atraves de um crawler assincrono que inspeciona o site da empresa a procura de solucoes de software do mercado nacional.
-4. **Qualifica** a oportunidade utilizando o modelo cognitivo **GPT-4o-mini**, calculando um *Score de Aderencia (0 a 100)* e redigindo um roteiro consultivo personalizado para abordagem.
-5. **Apresenta** os dados em interface CLI interativa e estruturada com Rich, gerando persistencia em SQLite WAL e exportacao pronta para prospecção.
+<p align="center">
+  <a href="#visao-geral">Visao Geral</a> &bull;
+  <a href="#recursos-principais">Recursos</a> &bull;
+  <a href="#arquitetura-do-sistema">Arquitetura</a> &bull;
+  <a href="#fluxo-do-pipeline">Pipeline</a> &bull;
+  <a href="#inicio-rapido">Instalacao</a> &bull;
+  <a href="#interface-de-linha-de-comando">Comandos</a> &bull;
+  <a href="#custos-e-viabilidade">Custos</a> &bull;
+  <a href="#licenca">Licenca</a>
+</p>
 
 ---
 
-## Demonstracao da Interface (CLI)
+</div>
 
-```
-+---------------------------------------------------------------------------------------+
-|  Sweezy AI v1.0               [Nova Varredura]  [Historico]  [Configuracoes]          |
-+---------------------------------------------------------------------------------------+
-| Filtros de Varredura:                                                                 |
-| [ Segmento: Restaurantes ] [ Cidade: Belo Horizonte/MG ] [ Raio: 5 km ] [ Iniciar ]   |
-+---------------------------------------------------------------------------------------+
-| Leads Qualificados (Ordenados por Potencial de Fechamento)                            |
-|                                                                                       |
-| +-----------------------------------------------------------------------------------+ |
-| | [Alto] Padaria e Confeitaria Sabor Real   Score: 94/100 | Porte: ME (Optante SN)  | |
-| | Endereco: Av. Fleming, 1200 - Ouro Preto  CNAE: 1091-1/02 - Padaria e Confeitaria | |
-| | Site: www.saborreal.com.br                Status PDV: NENHUM DETECTADO            | |
-| | Diagnostico IA: Atendimento por WhatsApp manual; cardapio em PDF; alta dor de     | |
-| |    fechamento de caixa e controle de desperdicio.                                  | |
-| | [ Abrir WhatsApp com Pitch ]  [ Copiar Diagnostico ]  [ Ver Socios/QSA ]          | |
-| +-----------------------------------------------------------------------------------+ |
-|                                                                                       |
-| +-----------------------------------------------------------------------------------+ |
-| | [Medio] Auto Mecanica Central             Score: 78/100 | Porte: EPP              | |
-| | Endereco: Rua Rio Grande, 450             Status PDV: Sistema Legado Detectado    | |
-| | [ Abrir WhatsApp com Pitch ]  [ Copiar Diagnostico ]  [ Ver Socios/QSA ]          | |
-| +-----------------------------------------------------------------------------------+ |
-+---------------------------------------------------------------------------------------+
-| Total Coletados: 120  |  Sem PDV/Moderno: 84 (70%)  |  Exportar: [ CSV ] [ Excel ]    |
-+---------------------------------------------------------------------------------------+
-```
+## Visao Geral
+
+O **Sweezy AI** e uma plataforma de engenharia de dados e inteligencia comercial orientada a prospeccao B2B no Brasil. 
+
+O sistema automatiza integralmente a cadeia de prospeccao ativa:
+1. **Localiza** estabelecimentos fisicos reais em qualquer coordenada geografica do Brasil via Google Places API (New).
+2. **Resolve** a identidade juridica do negocio na Receita Federal via BrasilAPI, obtendo CNPJ, CNAE primario/secundarios e quadro societario (QSA).
+3. **Inspeciona** paginas web com um crawler assincrono para identificar o nivel de digitalizacao e sistemas de ponto de venda (PDV/ERP).
+4. **Gera** um score preditivo de conversao (0 a 100) e diagnostico comercial consultivo customizado atraves do GPT-4o-mini com esquemas estritos.
+5. **Persiste** todos os dados estruturados em banco de dados local com SQLite em modo WAL e disponibiliza comandos CLI com relatorios formatados via Rich.
+
+> [!NOTE]
+> O motor foi projetado para descartar automaticamente nomes genericos e termos irrelevantes, garantindo que apenas estabelecimentos comerciais em atividade real entrem no funil de qualificacao.
 
 ---
 
-## Funcionalidades Principais
+## Destaques de Engenharia
 
-- **Varredura Geografica em Grade (Google Places API New)**:
-  - Divisao de poligonos urbanos em grades circulares para contornar o limite de 60 resultados do Google.
-  - Varredura exaustiva de bairros e regioes comerciais sem duplicacao de requisicoes.
-
-- **Enriquecimento Cadastral Oficial (Receita Federal / BrasilAPI)**:
-  - Resolucao automatizada do CNPJ a partir de razao social, nome comercial e localizacao.
-  - Coleta de Razao Social, CNAE Primario/Secundarios, Porte (MEI, ME, EPP), Situacao Cadastral e Quadro de Socios e Administradores (QSA).
-
-- **Deteccao Heuristica de PDV/ERP**:
-  - Crawler assincrono rapido (`httpx` + `lxml` + `BeautifulSoup4`).
-  - Inspecao de scripts JS, assinaturas de checkout, tags de rodape, subdominios, links de delivery integrado e metatags.
-  - Cobertura de sistemas lideres: Totvs, Linx, Bematech, Alterdata, Omie, ContaAzul, Bling, Hiper, Saipos, PDVSeven, Consumer, Teknisa, ConnectPlug, Granito, Stone, Cielo Lio, VR Software, entre outros.
-
-- **Qualificacao Cognitiva com GPT-4o-mini**:
-  - Validacao estrita via esquemas tipados do Pydantic v2.
-  - Atribuicao de Lead Score (0 a 100) ponderando presenca de site, ausencia de ERP, porte da empresa e tempo de atividade.
-  - Elaboracao de proposta de valor personalizada (*pitch consultivo*) pronta para envio.
-
-- **Interface CLI Formatada com Rich**:
-  - Execucao com paineis, tabelas estruturadas, logs coloridos e feedback em tempo real.
-  - Visualizacao detalhada da saude digital e dados societarios do estabelecimento.
-
-- **Acao Imediata via WhatsApp**:
-  - Geracao de links `https://wa.me/55...` com a mensagem consultiva pre-formatada.
-  - Abordagem direcionada com o nome do socio (obtido no QSA) e referencia ao negocio.
-
-- **Exportacao de Dados Pronta para Vendas**:
-  - Exportacao em formato `.csv` e banco de dados SQLite persistente estruturado para integracao com CRMs (HubSpot, RD Station, Pipedrive).
+| Componente | Especificacao Tecnica | Finalidade |
+| :--- | :--- | :--- |
+| **Grid Scanner** | Decomposicao geometrica em malha circular | Supera a limitacao de 60 resultados do Google Places com cobertura continua de poligonos urbanos |
+| **Enriquecimento Cadastral** | Integracao assincrona com BrasilAPI | Cruzamento instantaneo de Razao Social, Situacao Cadastral, Regime Tributario e Socios |
+| **Motor Heuristico** | Scanner de 50+ assinaturas tecnicas nacionais | Detecao em profundidade de sistemas como Totvs, Linx, Bematech, Omie, ContaAzul, Bling e Stone |
+| **Qualificacao Cognitiva** | OpenAI GPT-4o-mini com Structured Outputs | Calculo do Score de Aderencia e geracao de pitch comercial consultivo direto para WhatsApp |
+| **Persistencia de Alta Vazao**| SQLite com Write-Ahead Logging (WAL) | Operacoes concorrentes sem locks de leitura e exportacao imediata para CSV e CRM |
 
 ---
 
-## Arquitetura em Alto Nivel
-
-O fluxo de processamento opera de maneira desacoplada e assincrona atraves do pipeline orquestrado pelo `asyncio`:
+## Arquitetura do Sistema
 
 ```mermaid
 flowchart TD
-    subgraph Entrada["1. Parametros de Entrada"]
-        A["Nicho de Negocio<br>(ex: Restaurantes, Autopecas)"]
-        B["Localizacao Alvo<br>(Cidade, Bairro ou Coordenadas)"]
-        C["Raio de Cobertura<br>(Km)"]
-        A & B & C --> D["Orquestrador de Prospeccao<br>(Async Pipeline)"]
+    subgraph Input["1. Parametros de Execucao"]
+        A["Segmento Comercial<br>(ex: Restaurantes, Autopecas)"]
+        B["Coordenadas e Raio<br>(Latitude, Longitude, Metros)"]
+        A & B --> C["CLI Runner (Rich Interface)"]
     end
 
-    subgraph Discovery["2. Descoberta Geografica"]
-        D --> E["Google Places API (New)"]
-        E --> F["Varredura em Grade Circular<br>(Grid Scanner)"]
-        F --> G[("Base Preliminar<br>Nome, Endereco, Fone, Site")]
+    subgraph Pipeline["2. Pipeline Orquestrado (AsyncIO)"]
+        C --> D["Pipeline Orchestrator"]
+        D --> E["Google Places (New API)<br>Circular Grid Scanner"]
+        E --> F["BrasilAPI / Receita Federal<br>CNPJ, CNAE, Porte, Socios"]
+        F --> G["Async Web Scraper<br>Auditoria de Scripts e Metadados"]
+        G --> H["POS / ERP Detector<br>Catalogo de 50+ Assinaturas"]
+        H --> I["Cognitive LLM Qualifier<br>Score 0-100 e Pitch WhatsApp"]
     end
 
-    subgraph Enrichment["3. Enriquecimento Cadastral"]
-        G --> H["BrasilAPI / Receita Federal"]
-        H --> I["CNPJ, Razao Social, CNAE,<br>Porte da Empresa & QSA (Socios)"]
+    subgraph Storage["3. Camada de Dados"]
+        I --> J[("SQLite Database<br>Modo WAL Concorrente")]
+        J --> K["Exportador CSV / Relatorios"]
     end
 
-    subgraph Scraping["4. Analise Heuristica de TI"]
-        I --> J["Web Scraper Assincrono<br>(HTTPX + BS4 / lxml)"]
-        J --> K{"Possui Site / Plataforma?"}
-        K -- Sim --> L["Auditoria de Assinaturas<br>(Scripts, Tags, Links, Subdominios)"]
-        K -- Nao --> M["Sinalizacao: Ausencia Total de Software"]
-        L & M --> N["Relatorio de Maturidade Tecnologica<br>(Tem PDV / Nao Tem / Qual Sistema)"]
-    end
+    classDef blueBox fill:#0f2027,stroke:#203a43,stroke-width:2px,color:#ffffff;
+    classDef highlight fill:#16222f,stroke:#2c5364,stroke-width:2px,color:#00ffcc;
+    classDef storageBox fill:#1a1c24,stroke:#3b4252,stroke-width:2px,color:#eceff4;
+    class Input blueBox;
+    class Pipeline highlight;
+    class Storage storageBox;
+```
 
-    subgraph Qualification["5. Qualificacao Cognitiva"]
-        N --> O["OpenAI GPT-4o-mini<br>(via Structured Outputs)"]
-        O --> P["• Lead Score (0 - 100)<br>• Principais Dores & Desafios<br>• Pitch Consultivo WhatsApp"]
-    end
+---
 
-    subgraph Storage["6. Persistencia & Camada de Dados"]
-        P --> Q[("Banco de Dados Local<br>SQLite WAL")]
-    end
+## Interface de Linha de Comando (CLI)
 
-    subgraph Presentation["7. Apresentacao & Acao Comercial"]
-        Q --> R["Interface CLI Rich"]
-        R --> S["Disparo WhatsApp com 1-Clique<br>(api.whatsapp.com)"]
-        R --> T["Exportacao de Leads<br>(CSV / SQLite)"]
-    end
+O Sweezy AI conta com uma interface CLI construida com **Rich**, oferecendo tabelas com bordas limpas, medidores visuais e logs coloridos em tempo real.
 
-    classDef stage fill:#f0f7ff,stroke:#0066cc,stroke-width:2px,color:#03396c;
-    classDef llm fill:#fdf2e9,stroke:#d35400,stroke-width:2px,color:#7e3202;
-    classDef highlight fill:#eafaf1,stroke:#27ae60,stroke-width:2px,color:#145a32;
-    class Discovery,Enrichment,Scraping,Storage,Presentation stage;
-    class Qualification llm;
-    class S,T highlight;
+```
+================================================================================
+                           SWEEZY AI - PIPELINE RUNNER                          
+================================================================================
+Parametros:
+  Query: restaurantes
+  Centro: -19.9167, -43.9345
+  Raio: 3000 metros
+--------------------------------------------------------------------------------
+[1/4] Varredura Geografica Concluida: 12 estabelecimentos localizados.
+[2/4] Enriquecimento Cadastral: 12 registros consultados na Receita Federal.
+[3/4] Analise Heuristica de PDV: 10 alvos auditados via web scraping.
+[4/4] Qualificacao Cognitiva Concluida via GPT-4o-mini.
+================================================================================
+                           LEADS QUALIFICADOS (TOP LEADS)                       
+================================================================================
+Score  Empresa                        CNPJ               PDV Detectado      Porte 
+--------------------------------------------------------------------------------
+94     Padaria e Confeitaria Real     12.345.678/0001-90 Nenhum             ME    
+88     Restaurante Bella Vista        98.765.432/0001-11 Nenhum             EPP   
+76     Mecanica Central Ltda          11.222.333/0001-44 Legado             ME    
+--------------------------------------------------------------------------------
+Dados persistidos com sucesso em data/sweezy.db (Modo WAL ativado).
 ```
 
 ---
 
 ## Inicio Rapido
 
-### Pre-requisitos
-- **Python 3.12** ou superior instalado ([Download Python](https://www.python.org/downloads/)).
-- Chave de API do **Google Cloud Platform** com a *Places API (New)* ativada.
-- Chave de API da **OpenAI** com saldo disponivel.
-- Git instalado.
+### Pre-requisitos do Ambiente
+- **Python 3.12+** instalado.
+- Credenciais de API (Google Places API e OpenAI API).
 
-### 1. Clonar o Repositorio
+### 1. Clonagem e Configuracao do Ambiente Virtual
+
 ```bash
 git clone https://github.com/dgphaney-dev/sweezy-ai.git
 cd sweezy-ai
 ```
 
-### 2. Criar e Ativar o Ambiente Virtual
 No Windows (PowerShell):
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
-No Linux / macOS:
+No Linux ou macOS:
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 3. Instalar Dependencias
+### 2. Instalacao das Dependencias
+
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 4. Configurar as Variaveis de Ambiente
-Copie o modelo `.env.example` para `.env`:
+### 3. Variaveis de Ambiente
+
+Crie o arquivo `.env` a partir do modelo de exemplo:
+
 ```bash
 cp .env.example .env
 ```
 
-Abra o arquivo `.env` e preencha suas credenciais:
+Edite o arquivo `.env` com suas credenciais:
+
 ```ini
 ENVIRONMENT=development
 LOG_LEVEL=INFO
 
+# Google Cloud Places API (New)
 GOOGLE_PLACES_API_KEY=AIzaSy...
+
+# OpenAI API
 OPENAI_API_KEY=sk-proj-...
 OPENAI_MODEL_NAME=gpt-4o-mini
 
+# Banco de Dados Local
 DATABASE_URL=sqlite:///data/sweezy.db
 DATABASE_DIR=./data
 
+# Configuracoes do Scraper
 SCRAPER_TIMEOUT_SECONDS=10
 SCRAPER_MAX_CONCURRENT_REQUESTS=10
 ```
 
-### 5. Executar a Aplicacao
-Inicie a interface CLI do Sweezy AI:
+> [!IMPORTANT]
+> O arquivo `.env` e as bases de dados em `data/` sao estritamente ignorados pelo `.gitignore` e nunca devem ser versionados em repositorios publicos.
+
+---
+
+## Comandos Disponiveis
+
+A CLI disponibiliza comandos dedicados para cada etapa da operacao:
+
+### Executar Varredura e Qualificacao
+
 ```bash
-python cli.py
+python cli.py scan --query "restaurantes" --lat -19.9167 --lng -43.9345 --radius 3000
 ```
 
-Ou execute comandos especificos:
+### Listar Leads Armazenados
+
 ```bash
-# Executar varredura
-python cli.py scan --query "restaurantes" --lat -19.9167 --lng -43.9345 --radius 3000
-
-# Listar leads coletados
 python cli.py list-leads
+```
 
-# Exportar leads para CSV
-python cli.py export-leads --output leads.csv
+### Exportar Dados para Planilhas / CRM
+
+```bash
+python cli.py export-leads --output leads_qualificados.csv
+```
+
+### Detalhar Lead Especifico
+
+```bash
+python cli.py view-lead --id 1
 ```
 
 ---
 
-## Estrutura do Projeto
-
-A aplicacao adota arquitetura modular limpa, separando responsabilidades de rede, parsing, banco de dados, inteligencia artificial e interface de linha de comando:
+## Estrutura do Codigo-Fonte
 
 ```text
 sweezy-ai/
-├── .env.example              # Modelo com documentacao das variaveis de ambiente
-├── .gitignore                # Regras de exclusao do Git (segredos e dados ignorados)
-├── pyproject.toml            # Especificacao de empacotamento e dependencias
-├── requirements.txt          # Dependencias pinadas do projeto
-├── README.md                 # Documentacao oficial do projeto (este arquivo)
-├── cli.py                    # Interface de linha de comando com formatacao Rich
-│
-├── config/                   # Configuracoes centralizadas e loader de ambiente
-│   ├── __init__.py
-│   └── settings.py           # Validacao e tipagem de configuracoes
-│
-├── core/                     # Modelos de dados e camada de persistencia
-│   ├── __init__.py
-│   ├── database.py           # Conexao SQLite com modo WAL e operacoes CRUD
-│   └── models.py             # Modelos de dados estruturados
-│
-├── discovery/                # Modulo de busca geografica e Receita Federal
-│   ├── __init__.py
-│   ├── google_places.py      # Cliente da Google Places API (New)
-│   ├── grid_scanner.py       # Algoritmo de grade circular para cobertura total
-│   └── receita_federal.py    # Consulta de CNPJ, CNAE e socios via BrasilAPI
-│
-├── analysis/                 # Deteccao de PDV, web scraping e IA
-│   ├── __init__.py
-│   ├── pos_detector.py       # Catalogo de heurísticas de PDV/ERP
-│   ├── web_scraper.py        # Coletor assincrono de metadados e scripts
-│   └── llm_qualifier.py      # Qualificacao cognitiva via GPT-4o-mini
-│
-├── pipeline/                 # Orquestrador do fluxo ponta a ponta
-│   ├── __init__.py
-│   └── lead_pipeline.py      # Pipeline completo: Busca -> Enriquecimento -> Analise -> IA -> DB
-│
-├── docs/                     # Documentacao tecnica complementar
-│   ├── api_integrations.md
-│   ├── architecture.md
-│   ├── data_models.md
-│   ├── heuristics.md
-│   └── setup_guide.md
-│
-└── tests/                    # Suite de testes automatizados com Pytest
-    ├── __init__.py
-    ├── test_core_and_db.py
-    ├── test_discovery.py
-    ├── test_analysis.py
-    └── test_pipeline_and_cli.py
+|-- .env.example              # Template de configuracao de variaveis
+|-- .gitignore                # Protecao contra versionamento de credenciais e dados
+|-- pyproject.toml            # Definicao de build e dependencias do projeto
+|-- requirements.txt          # Requisitos de instalacao pinados
+|-- README.md                 # Documentacao tecnica do projeto
+|-- cli.py                    # Ponto de entrada CLI interativo formatado com Rich
+|
+|-- config/                   # Central de configuracao
+|   |-- __init__.py
+|   `-- settings.py           # Validacao e tipagem com Pydantic Settings
+|
+|-- core/                     # Nucleo de dados e persistencia
+|   |-- __init__.py
+|   |-- database.py           # Engine SQLite com modo WAL e operacoes ACID
+|   `-- models.py             # Modelos de dados e schemas de dominio
+|
+|-- discovery/                # Localizacao geografica e cadastral
+|   |-- __init__.py
+|   |-- google_places.py      # Cliente assincrono Google Places API (New)
+|   |-- grid_scanner.py       # Algoritmo de sub-malha circular
+|   `-- receita_federal.py    # Integracao com Receita Federal via BrasilAPI
+|
+|-- analysis/                 # Inteligencia tecnica e cognitiva
+|   |-- __init__.py
+|   |-- pos_detector.py       # Deteccao heuristica com catalogo de 50+ sistemas
+|   |-- web_scraper.py        # Coletor assincrono com parser lxml/bs4
+|   `-- llm_qualifier.py      # Qualificador cognitivo via GPT-4o-mini
+|
+|-- pipeline/                 # Orquestracao do fluxo de ponta a ponta
+|   |-- __init__.py
+|   `-- lead_pipeline.py      # Pipeline completo de transformacao de dados
+|
+|-- docs/                     # Guias detalhados de referencia
+|   |-- api_integrations.md   # Especificacao das APIs externas
+|   |-- architecture.md       # Diagramas e padroes arquiteturais
+|   |-- data_models.md        # Dicionario de dados e tabelas
+|   |-- heuristics.md         # Catalogo e regras de assinaturas de software
+|   `-- setup_guide.md        # Guia passo a passo de deployment
+|
+`-- tests/                    # Bateria de testes automatizados (Pytest)
+    |-- __init__.py
+    |-- test_core_and_db.py
+    |-- test_discovery.py
+    |-- test_analysis.py
+    `-- test_pipeline_and_cli.py
 ```
 
 ---
 
-## Tecnologias Utilizadas
+## Custos e Viabilidade Operacional
 
-| Tecnologia | Versao / Biblioteca | Finalidade no Projeto |
+O Sweezy AI foi concebido com arquitetura de baixissimo custo por lead qualificado:
+
+| Recurso | Nivel de Servico | Custo Estimado (1.000 Leads) |
 | :--- | :--- | :--- |
-| **Linguagem Principal** | `Python 3.12+` | Linguagem base com tipagem estatica e suporte aprimorado a `asyncio`. |
-| **Interface de Usuario** | `Rich` | Formatacao de tabelas, paineis e saidas visuais no terminal. |
-| **Descoberta Geografica** | `Google Places API (New)` | Busca de pontos de interesse comerciais com coordenadas e dados de contato. |
-| **Dados Oficiais Brasil** | `BrasilAPI` | Consulta aberta e gratuita de dados cadastrais da Receita Federal (CNPJ, CNAE, QSA). |
-| **Motor de Qualificacao**| `OpenAI GPT-4o-mini` | Modelo cognitivo para diagnostico de dores e geracao de roteiros de abordagem. |
-| **Parsing e Scraping** | `httpx` + `BeautifulSoup4` + `lxml` | Coleta assincrona de paginas e inspecao de heurísticas de PDV. |
-| **Banco de Dados** | `SQLite (WAL mode)` | Persistencia local confiavel com alta concorrencia e zero manutencao externa. |
-| **Testes Automatizados** | `pytest` + `pytest-asyncio` | Suite completa de testes unitarios e de integracao. |
+| **Google Places API (New)** | Requisicoes em grade otimizadas | **R$ 0,00** (coberto pelo credito mensal recorrente de $200 USD do Google Cloud) |
+| **BrasilAPI / Receita** | Consultas publicas cadastrais | **R$ 0,00** (servico gratuito e aberto) |
+| **OpenAI GPT-4o-mini** | Structured Outputs (~700 tokens/lead) | **~R$ 1,20 a R$ 1,60** |
+| **Banco de Dados (SQLite)** | Armazenamento local WAL | **R$ 0,00** (sem custos de servidor dedicado) |
+| **Custo Total por 1.000 Leads**| Pipeline completo | **~R$ 1,50** |
 
 ---
 
-## Custos Operacionais Estimados
+## Testes Automatizados
 
-O Sweezy AI foi desenhado com foco em custo operacional minimo:
+A suite de testes cobre validacao de modelos, conexao de banco, rotinas de grid, parsing de heurísticas e pipeline:
 
-| Servico / API | Modelo de Preco | Custo Medio Estimado por 1.000 Leads | Observacoes |
-| :--- | :--- | :---: | :--- |
-| **Google Places API (New)** | Requisicoes detalhadas | **R$ 0,00** *(dentro do Free Tier)* | O Google Cloud concede **$200 de credito mensal gratuito** recorrente. |
-| **BrasilAPI** | Open-source Comunidade | **R$ 0,00** *(100% Gratuito)* | Sem custos de assinatura nem limite restritivo para operacoes normais. |
-| **OpenAI GPT-4o-mini** | Tokens de entrada/saida | **~R$ 1,00 a R$ 1,50** | Prompt otimizado consumindo volume reduzido de tokens por estabelecimento. |
-| **Banco de Dados (SQLite)** | Embutido local | **R$ 0,00** | Custo zero de servidores ou hospedagem externa. |
-| **TOTAL MEDIO ESTIMADO** | — | **~R$ 1,50 a cada 1.000 Leads** | **Retorno sobre investimento imediato.** |
+```bash
+pytest
+```
 
----
+Saida esperada:
+```
+tests/test_core_and_db.py ......                                         [ 24%]
+tests/test_discovery.py ......                                           [ 48%]
+tests/test_analysis.py .......                                           [ 76%]
+tests/test_pipeline_and_cli.py ......                                    [100%]
 
-## Roadmap de Desenvolvimento
-
-- [x] **v1.0 — MVP Funcional (Versao Atual)**
-  - [x] Varredura geografica automatizada via Google Places API (New).
-  - [x] Enriquecimento cadastral de CNPJ, CNAE e QSA via BrasilAPI / Receita Federal.
-  - [x] Motor de heuristicas com catalogo de assinaturas de PDV/ERP nacionais.
-  - [x] Qualificacao cognitiva via GPT-4o-mini.
-  - [x] Interface CLI moderna com formatacao Rich.
-  - [x] Persistencia SQLite WAL com exportacao para CSV.
-  - [x] Suite de testes com 100% de aprovacao.
-
-- [ ] **v1.5 — Automacao de WhatsApp e Mensageria**
-  - [ ] Integracao com APIs de mensageria para envio com 1-clique.
-  - [ ] Cadencia de mensagens automatizada e agendamento de follow-ups.
-
-- [ ] **v2.0 — Interface Grafica e Escala**
-  - [ ] Interface visual Desktop/Web com Flet / Flutter.
-  - [ ] Suporte a banco PostgreSQL multi-usuario.
+============================== 25 passed in 2.45s ==============================
+```
 
 ---
 
-## Contribuindo
+## Contribuicao
 
-1. Faca um **Fork** do projeto.
-2. Crie uma Branch para sua feature ou correcao:
+1. Crie um fork do projeto no GitHub.
+2. Crie uma branch para sua funcionalidade:
    ```bash
-   git checkout -b feature/nova-heuristica-pdv
+   git checkout -b feature/minha-melhoria
    ```
-3. Realize seus commits seguindo o padrao convencional:
+3. Faca o commit das alteracoes com mensagens semanticas:
    ```bash
-   git commit -m "feat(analysis): adiciona assinatura do sistema X"
+   git commit -m "feat(analysis): adiciona suporte ao ERP X"
    ```
-4. Verifique os testes com pytest:
-   ```bash
-   pytest
-   ```
-5. Envie um **Push** para sua Branch e abra um **Pull Request**.
+4. Execute os testes locais com `pytest`.
+5. Envie a branch para o GitHub e abra um Pull Request detalhado.
 
 ---
 
 ## Licenca
 
-Este projeto e distribuido sob os termos da licenca **MIT**. Consulte o arquivo [LICENSE](LICENSE) para obter mais informacoes.
+Distribuido sob a licenca MIT. Consulte o arquivo [LICENSE](LICENSE) para mais informacoes.
 
 ---
 
-<p align="center">
-  <b>Sweezy AI</b> — Construido para acelerar a transformacao digital no comercio brasileiro.
-</p>
+<div align="center">
+  <sub>Sweezy AI &bull; Plataforma de Inteligencia B2B &bull; Desenvolvido para transformar dados publicos em oportunidades reais de negocio.</sub>
+</div>
