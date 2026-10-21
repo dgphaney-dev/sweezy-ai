@@ -814,6 +814,19 @@ class GooglePlacesClient:
             try:
                 response = await client.post(url, headers=headers, json=payload)
                 if response.status_code == 429:
+                    err_body = response.text
+                    if "Quota exceeded" in err_body or attempt == 3:
+                        query_term = f"{included_types[0] if included_types else 'comercio'} em {region_hint or ''}".strip()
+                        logger.warning(
+                            f"Cota diária de SearchNearby esgotada no Google Cloud. Alternando automaticamente para Text Search: '{query_term}'..."
+                        )
+                        return await self.search_text(
+                            query=query_term,
+                            lat=lat,
+                            lng=lng,
+                            radius_meters=radius_meters,
+                            max_results=max_results,
+                        )
                     wait_secs = 2.0 * attempt
                     logger.warning(
                         f"Limite de taxa temporário (HTTP 429) no Google Places. Aguardando {wait_secs:.1f}s (tentativa {attempt}/3)..."
