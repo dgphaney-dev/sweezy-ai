@@ -36,7 +36,6 @@ class SettingsView(ft.Container):
             can_reveal_password=True,
             bgcolor=BG_CARD,
             border_color=BORDER_COLOR,
-            focused_border_color=ACCENT_CYAN,
             expand=True,
         )
 

@@ -20,7 +20,7 @@ from ui.views.scan_view import ScanView
 from ui.views.settings_view import SettingsView
 
 
-def main(page: ft.Page) -> None:
+async def main(page: ft.Page) -> None:
     """Inicializacao da aplicacao Desktop."""
     apply_page_theme(page)
 
@@ -28,16 +28,16 @@ def main(page: ft.Page) -> None:
         """Callback executado ao finalizar uma varredura."""
         pass
 
-    def on_tab_change(tab_index: int) -> None:
+    async def on_tab_change(tab_index: int) -> None:
         """Alterna a exibicao dos modulos conforme a aba selecionada."""
         if tab_index == 0:
             content_area.content = scan_view
         elif tab_index == 1:
             content_area.content = leads_view
-            leads_view.load_leads()
+            await leads_view.load_leads()
         elif tab_index == 2:
             content_area.content = analytics_view
-            analytics_view.load_stats()
+            await analytics_view.load_stats()
         elif tab_index == 3:
             content_area.content = settings_view
         page.update()
@@ -65,7 +65,7 @@ def main(page: ft.Page) -> None:
     )
 
     # Carrega contadores iniciais de fundo
-    leads_view.load_leads()
+    await leads_view.load_leads()
     page.update()
 
 

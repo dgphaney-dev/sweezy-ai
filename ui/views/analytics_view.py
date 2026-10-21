@@ -51,7 +51,7 @@ class AnalyticsView(ft.Container):
                             ft.IconButton(
                                 icon=ft.Icons.REFRESH,
                                 tooltip="Atualizar Métricas",
-                                on_click=lambda e: self.load_stats(),
+                                on_click=self._on_refresh_clicked,
                             ),
                         ],
                     ),
@@ -116,19 +116,15 @@ class AnalyticsView(ft.Container):
             ],
         )
 
-    def load_stats(self) -> None:
-        """Carrega dados estatisticos do SQLite e atualiza os graficos."""
-        async def _fetch() -> dict[str, Any]:
-            await init_db()
-            async with get_db_session() as session:
-                return await get_lead_stats(session=session)
+    async def _on_refresh_clicked(self, e: Any) -> None:
+        """Atualiza os indicadores comerciais."""
+        await self.load_stats()
 
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        try:
-            stats = loop.run_until_complete(_fetch())
-        finally:
-            loop.close()
+    async def load_stats(self) -> None:
+        """Carrega dados estatisticos do SQLite e atualiza os graficos."""
+        await init_db()
+        async with get_db_session() as session:
+            stats = await get_lead_stats(session=session)
 
         total = stats.get("total_leads", 0)
         high = stats.get("high_priority", 0)
@@ -152,5 +148,7 @@ class AnalyticsView(ft.Container):
             self._build_distribution_bar("Baixa Prioridade (Já utilizam ERP Consolidado)", low, total, ACCENT_BLUE),
         ])
 
-        if self.page:
-            self.page.update()
+        try:
+            self.update()
+        except Exception:
+            pass

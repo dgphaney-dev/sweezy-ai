@@ -34,7 +34,6 @@ class LeadsView(ft.Container):
             prefix_icon=ft.Icons.SEARCH,
             bgcolor=BG_CARD,
             border_color=BORDER_COLOR,
-            focused_border_color=ACCENT_CYAN,
             expand=True,
             on_change=self._on_search_changed,
         )
@@ -51,7 +50,7 @@ class LeadsView(ft.Container):
             icon=ft.Icons.REFRESH,
             tooltip="Atualizar Leads",
             icon_color=TEXT_SECONDARY,
-            on_click=lambda e: self.load_leads(),
+            on_click=self._on_refresh_clicked,
         )
 
         # Chips / Segmentos de filtro de prioridade
@@ -122,6 +121,10 @@ class LeadsView(ft.Container):
             ),
         )
 
+    async def _on_refresh_clicked(self, e: Any) -> None:
+        """Atualiza a lista de leads."""
+        await self.load_leads()
+
     def _build_filter_chip(self, label: str, value: str, color: str, is_active: bool = False) -> ft.Container:
         """Cria um botao de filtro estilisado."""
         return ft.Container(
@@ -134,7 +137,7 @@ class LeadsView(ft.Container):
             content=ft.Text(label, size=12, weight=ft.FontWeight.W_600 if is_active else ft.FontWeight.NORMAL, color=color if is_active else TEXT_SECONDARY),
         )
 
-    def _on_filter_clicked(self, filter_value: str) -> None:
+    async def _on_filter_clicked(self, filter_value: str) -> None:
         """Atualiza o filtro de prioridade selecionado."""
         self.current_filter = filter_value
         for chip in self.filter_buttons.controls:
@@ -149,33 +152,25 @@ class LeadsView(ft.Container):
             chip.content.color = ACCENT_CYAN if is_active else TEXT_SECONDARY
             chip.content.weight = ft.FontWeight.W_600 if is_active else ft.FontWeight.NORMAL
 
-        self.load_leads()
+        await self.load_leads()
 
-    def _on_search_changed(self, e: Any) -> None:
+    async def _on_search_changed(self, e: Any) -> None:
         """Dispara busca ao digitar com debounce implicito."""
-        self.load_leads()
+        await self.load_leads()
 
-    def load_leads(self) -> None:
+    async def load_leads(self) -> None:
         """Busca leads do banco de dados assincrono e popula a lista."""
         query_text = (self.search_input.value or "").strip()
         prio = None if self.current_filter == "ALL" else self.current_filter
 
-        async def _fetch() -> list[Any]:
-            await init_db()
-            async with get_db_session() as session:
-                return await list_leads(
-                    likelihood=prio,
-                    search_query=query_text or None,
-                    limit=100,
-                    session=session,
-                )
-
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        try:
-            leads = loop.run_until_complete(_fetch())
-        finally:
-            loop.close()
+        await init_db()
+        async with get_db_session() as session:
+            leads = await list_leads(
+                likelihood=prio,
+                search_query=query_text or None,
+                limit=100,
+                session=session,
+            )
 
         self.leads_list.controls.clear()
         if not leads:
@@ -200,25 +195,19 @@ class LeadsView(ft.Container):
             for lead in leads:
                 self.leads_list.controls.append(LeadCard(lead))
 
-        if self.page:
-            self.page.update()
+        try:
+            self.update()
+        except Exception:
+            pass
 
-    def _export_csv_clicked(self, e: Any) -> None:
+    async def _export_csv_clicked(self, e: Any) -> None:
         """Exporta os leads para arquivo CSV e notifica o usuario."""
         prio = None if self.current_filter == "ALL" else self.current_filter
         out_name = "leads_exportados.csv"
 
-        async def _do_export() -> int:
-            await init_db()
-            async with get_db_session() as session:
-                return await export_leads_to_csv(output_path=out_name, likelihood=prio, session=session)
-
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        try:
-            total = loop.run_until_complete(_do_export())
-        finally:
-            loop.close()
+        await init_db()
+        async with get_db_session() as session:
+            total = await export_leads_to_csv(output_path=out_name, likelihood=prio, session=session)
 
         full_path = os.path.abspath(out_name)
         try:

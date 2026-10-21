@@ -37,7 +37,6 @@ class ScanView(ft.Container):
             value="Brasília",
             bgcolor=BG_CARD,
             border_color=BORDER_COLOR,
-            focused_border_color=ACCENT_CYAN,
             expand=2,
         )
 
@@ -46,7 +45,6 @@ class ScanView(ft.Container):
             value="DF",
             bgcolor=BG_CARD,
             border_color=BORDER_COLOR,
-            focused_border_color=ACCENT_CYAN,
             expand=1,
             options=[
                 ft.dropdown.Option("DF"),
@@ -68,7 +66,6 @@ class ScanView(ft.Container):
             value="restaurantes",
             bgcolor=BG_CARD,
             border_color=BORDER_COLOR,
-            focused_border_color=ACCENT_CYAN,
             expand=2,
             options=[
                 ft.dropdown.Option("restaurantes", text="Restaurantes e Alimentação"),
@@ -204,11 +201,13 @@ class ScanView(ft.Container):
                 ],
             )
         )
-        if self.page:
-            self.page.update()
+        try:
+            self.update()
+        except Exception:
+            pass
 
-    def _start_scan_clicked(self, e: Any) -> None:
-        """Dispara a rotina de varredura assincrona em thread dedicada."""
+    async def _start_scan_clicked(self, e: Any) -> None:
+        """Dispara a rotina de varredura assincrona."""
         cidade = (self.cidade_input.value or "Brasília").strip()
         uf = (self.uf_input.value or "DF").strip()
         tipo = (self.tipo_input.value or "restaurantes").strip()
@@ -220,22 +219,12 @@ class ScanView(ft.Container):
         self.status_label.value = f"Geocodificando {cidade}, {uf}..."
         self.log_list.controls.clear()
         self._append_log(f"Iniciando varredura para {cidade}, {uf} (Raio: {raio:.1f} km, Segmento: {tipo})...")
-        self.page.update()
-
-        threading.Thread(
-            target=self._run_scan_thread,
-            args=(cidade, uf, tipo, raio),
-            daemon=True,
-        ).start()
-
-    def _run_scan_thread(self, cidade: str, uf: str, tipo: str, raio: float) -> None:
-        """Executa o loop de eventos assincrono na thread de trabalho."""
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
         try:
-            loop.run_until_complete(self._execute_scan_async(cidade, uf, tipo, raio))
-        finally:
-            loop.close()
+            self.update()
+        except Exception:
+            pass
+
+        await self._execute_scan_async(cidade, uf, tipo, raio)
 
     async def _execute_scan_async(self, cidade: str, uf: str, tipo: str, raio: float) -> None:
         """Rotina assincrona de resolucao de coordenadas e pipeline."""
@@ -269,8 +258,10 @@ class ScanView(ft.Container):
                 self.status_label.value = "Varredura concluída com sucesso!"
                 self.progress_bar.value = 1.0
 
-            if self.page:
-                self.page.update()
+            try:
+                self.update()
+            except Exception:
+                pass
 
         try:
             result = await pipeline.run_scan(
@@ -296,7 +287,9 @@ class ScanView(ft.Container):
         finally:
             self.btn_iniciar.disabled = False
             self.progress_bar.visible = False
-            if self.page:
-                self.page.update()
+            try:
+                self.update()
+            except Exception:
+                pass
             if self.on_scan_finished:
                 self.on_scan_finished()

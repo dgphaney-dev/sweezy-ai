@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 from typing import Callable
 import flet as ft
 
@@ -19,7 +20,7 @@ from ui.theme import (
 class Header(ft.Container):
     """Barra superior com branding e navegacao entre modulos."""
 
-    def __init__(self, on_tab_change: Callable[[int], None]) -> None:
+    def __init__(self, on_tab_change: Callable[[int], Any]) -> None:
         self.on_tab_change = on_tab_change
 
         self.tab_bar = ft.TabBar(
@@ -38,7 +39,7 @@ class Header(ft.Container):
             length=4,
             selected_index=0,
             animation_duration=200,
-            on_change=lambda e: self.on_tab_change(int(e.control.selected_index)),
+            on_change=self._tab_changed,
             content=self.tab_bar,
         )
 
@@ -91,3 +92,10 @@ class Header(ft.Container):
                 ],
             ),
         )
+
+    async def _tab_changed(self, e: Any) -> None:
+        """Propaga a mudanca de aba para o callback registrado."""
+        idx = int(e.control.selected_index)
+        res = self.on_tab_change(idx)
+        if inspect.isawaitable(res):
+            await res
