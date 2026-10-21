@@ -33,28 +33,40 @@ console = Console(legacy_windows=False)
 
 @app.command("scan")
 def scan_command(
-    location: str | None = typer.Argument(None, help="Localização (ex: 'Brasília, DF')"),
-    region: str | None = typer.Option(None, "--region", "-r"),
-    city: str | None = typer.Option(None, "--city", "--cidade"),
-    state: str | None = typer.Option(None, "--state", "--estado"),
-    lat: float | None = typer.Option(None, "--lat"),
-    lng: float | None = typer.Option(None, "--lng"),
-    radius: float = typer.Option(2.0, "--radius"),
-    business_type: str = typer.Option("all", "--type", "-t"),
-    step: float = typer.Option(1.0, "--step"),
-    concurrency: int = typer.Option(5, "--concurrency", "-c"),
-    dry_run: bool = typer.Option(False, "--dry-run"),
+    location: str | None = typer.Argument(None, help="Cidade e UF (ex: 'Belo Horizonte, MG' ou 'Curitiba, PR')"),
+    region: str | None = typer.Option(None, "--region", "-r", help="Regiao ou bairro"),
+    city: str | None = typer.Option(None, "--city", "--cidade", "-c", help="Nome da cidade (ex: Curitiba)"),
+    state: str | None = typer.Option(None, "--state", "--estado", "--uf", "-u", help="UF ou Estado (ex: PR)"),
+    lat: float | None = typer.Option(None, "--lat", hidden=True),
+    lng: float | None = typer.Option(None, "--lng", hidden=True),
+    radius: float = typer.Option(3.0, "--radius", "--raio", help="Raio de busca em km (padrao: 3.0)"),
+    business_type: str = typer.Option("restaurantes", "--type", "--tipo", "-t", help="Tipo de comercio (ex: restaurantes, padarias, autopecas)"),
+    step: float = typer.Option(1.0, "--step", hidden=True),
+    concurrency: int = typer.Option(5, "--concurrency", help="Requisicoes concorrentes"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Modo simulado sem chamadas de rede"),
 ) -> None:
-    """Executa o pipeline completo de varredura, enriquecimento e qualificação."""
-    target_region = location or region or (f"{city}, {state}" if (city and state) else (city or state or "Brasília, DF"))
+    """Executa o pipeline completo de varredura, enriquecimento e qualificacao por Cidade e UF."""
+    target_region = location or region
+    if not target_region and (city or state):
+        target_region = f"{city}, {state}" if (city and state) else (city or state or "")
+
+    if not target_region and lat is None and lng is None:
+        console.print("[bold cyan]Configure a Cidade e UF para varredura:[/bold cyan]")
+        cidade_digitada = typer.prompt("Nome da Cidade (ex: Curitiba)")
+        uf_digitada = typer.prompt("Sigla do Estado / UF (ex: PR)")
+        target_region = f"{cidade_digitada.strip()}, {uf_digitada.strip()}"
+
+    if not target_region:
+        target_region = "Brasilia, DF"
+
     actual_lat, actual_lng = lat, lng
 
     if actual_lat is None or actual_lng is None:
-        console.print(f"[bold cyan]Identificando coordenadas de:[/bold cyan] [green]{target_region}[/green]...")
+        console.print(f"[bold cyan]Localizando:[/bold cyan] [green]{target_region}[/green]...")
         geo_lat, geo_lng, display_name = asyncio.run(geocode_location(target_region))
-        actual_lat = actual_lat or geo_lat
-        actual_lng = actual_lng or geo_lng
-        console.print(f"[dim]Localidade: {display_name} ({actual_lat:.4f}, {actual_lng:.4f})[/dim]")
+        actual_lat = geo_lat
+        actual_lng = geo_lng
+        console.print(f"[dim]Regiao confirmada: {display_name}[/dim]")
 
     console.print(
         Panel.fit(
