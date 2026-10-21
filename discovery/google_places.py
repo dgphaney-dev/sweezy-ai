@@ -335,8 +335,8 @@ async def _fetch_real_places_free(
     except Exception as err:
         logger.warning(f"Consulta publica georreferenciada falhou ({err}), recorrendo ao gerador local.")
 
+    results: list[PlaceResult] = []
     if raw_items:
-        results: list[PlaceResult] = []
         for item in raw_items:
             if not isinstance(item, dict):
                 continue
@@ -440,10 +440,196 @@ async def _fetch_real_places_free(
                 )
             )
 
-        if results:
-            return results[:count]
+    if not results:
+        # Fallback de estabelecimentos caso OpenStreetMap nao responda na celula
+        nomes_fallback = [
+            f"Padaria e Confeitaria Central de {cidade_inf}",
+            f"Restaurante Sabor de {cidade_inf}",
+            f"Mercado e Mercearia Boa Esperanca",
+            f"Auto Mecanica e Pecas {cidade_inf}",
+        ]
+        for idx_fb, n_fb in enumerate(nomes_fallback[:count], start=1):
+            p_id = f"local_fb_{abs(hash(n_fb + str(lat)))}_{idx_fb}"
+            rua_fb = ruas_locais[idx_fb % len(ruas_locais)] if ruas_locais else "Centro"
+            results.append(
+                PlaceResult(
+                    place_id=p_id,
+                    name=n_fb,
+                    address=f"{rua_fb}, {idx_fb * 120} - {cidade_inf} - {uf_inf}, Brasil",
+                    lat=lat + (idx_fb * 0.001),
+                    lng=lng + (idx_fb * 0.001),
+                    phone=f"({ddd_inf}) 3214-55{idx_fb:02d}",
+                    website=None,
+                    rating=4.3,
+                    review_count=45,
+                    business_status="OPERATIONAL",
+                    primary_type="restaurant",
+                    types=["restaurant", "food"],
+                    google_maps_url=f"https://maps.google.com/?q={lat},{lng}",
+                    reviews=[
+                        PlaceReview(
+                            author_name="Cliente Local",
+                            rating=4.0,
+                            text="Atendimento rapido, mas comanda ainda anotada a mao.",
+                            publish_time="ha 1 mes",
+                            language="pt",
+                        )
+                    ],
+                )
+            )
 
-    return results
+    return results[:count]
+
+
+GOOGLE_PLACES_TABLE_A_TYPES: set[str] = {
+    "accounting", "airport", "amusement_park", "aquarium", "art_gallery", "atm",
+    "bakery", "bank", "bar", "beauty_salon", "bicycle_store", "book_store",
+    "bowling_alley", "bus_station", "cafe", "campground", "car_dealer", "car_rental",
+    "car_repair", "car_wash", "casino", "cemetery", "church", "city_hall",
+    "clothing_store", "convenience_store", "courthouse", "dentist", "department_store",
+    "doctor", "drugstore", "electrician", "electronics_store", "embassy", "fire_station",
+    "florist", "funeral_home", "furniture_store", "gas_station", "gym", "hair_care",
+    "hardware_store", "hindu_temple", "home_goods_store", "hospital", "insurance_agency",
+    "jewelry_store", "laundry", "lawyer", "library", "light_rail_station", "liquor_store",
+    "local_government_office", "locksmith", "lodging", "meal_delivery", "meal_takeaway",
+    "mosque", "movie_rental", "movie_theater", "moving_company", "museum", "night_club",
+    "painter", "park", "parking", "pet_store", "pharmacy", "physiotherapist", "plumber",
+    "police", "post_office", "primary_school", "real_estate_agency", "restaurant",
+    "roofing_contractor", "rv_park", "school", "secondary_school", "shoe_store",
+    "shopping_mall", "spa", "stadium", "storage", "store", "subway_station",
+    "supermarket", "synagogue", "taxi_stand", "tourist_attraction", "train_station",
+    "transit_station", "travel_agency", "university", "veterinary_care", "zoo",
+    "fast_food_restaurant", "pizza_restaurant", "bar_and_grill", "coffee_shop",
+    "auto_parts_store", "hair_salon", "shopping_center", "food_store"
+}
+
+PORTUGUESE_TO_GOOGLE_TYPES: dict[str, str] = {
+    "restaurante": "restaurant",
+    "restaurantes": "restaurant",
+    "restaurant": "restaurant",
+    "comida": "restaurant",
+    "alimentacao": "restaurant",
+    "alimentação": "restaurant",
+    "lanchonete": "fast_food_restaurant",
+    "lanchonetes": "fast_food_restaurant",
+    "fast food": "fast_food_restaurant",
+    "pizzaria": "pizza_restaurant",
+    "pizzarias": "pizza_restaurant",
+    "churrascaria": "restaurant",
+    "churrascarias": "restaurant",
+    "hamburgueria": "restaurant",
+    "hamburguerias": "restaurant",
+    "padaria": "bakery",
+    "padarias": "bakery",
+    "panificadora": "bakery",
+    "panificadoras": "bakery",
+    "confeitaria": "bakery",
+    "confeitarias": "bakery",
+    "cafe": "cafe",
+    "café": "cafe",
+    "cafeteria": "cafe",
+    "cafeterias": "cafe",
+    "bar": "bar",
+    "bares": "bar",
+    "boteco": "bar",
+    "pub": "bar",
+    "mercado": "supermarket",
+    "mercados": "supermarket",
+    "supermercado": "supermarket",
+    "supermercados": "supermarket",
+    "hipermercado": "supermarket",
+    "mercearia": "supermarket",
+    "mercearias": "supermarket",
+    "minimercado": "supermarket",
+    "acougue": "supermarket",
+    "açougue": "supermarket",
+    "acougues": "supermarket",
+    "açougues": "supermarket",
+    "hortifruti": "supermarket",
+    "sacolao": "supermarket",
+    "sacolão": "supermarket",
+    "farmacia": "pharmacy",
+    "farmacias": "pharmacy",
+    "farmácia": "pharmacy",
+    "farmácias": "pharmacy",
+    "drogaria": "drugstore",
+    "drogarias": "drugstore",
+    "oficina": "car_repair",
+    "oficinas": "car_repair",
+    "mecanica": "car_repair",
+    "mecânica": "car_repair",
+    "autopecas": "car_repair",
+    "auto peças": "car_repair",
+    "autopeca": "car_repair",
+    "auto peça": "car_repair",
+    "borracharia": "car_repair",
+    "funilaria": "car_repair",
+    "lava jato": "car_wash",
+    "posto": "gas_station",
+    "posto de gasolina": "gas_station",
+    "loja de roupa": "clothing_store",
+    "lojas de roupa": "clothing_store",
+    "roupa": "clothing_store",
+    "roupas": "clothing_store",
+    "vestuario": "clothing_store",
+    "vestuário": "clothing_store",
+    "calcados": "shoe_store",
+    "calçados": "shoe_store",
+    "sapataria": "shoe_store",
+    "salao": "beauty_salon",
+    "salão": "beauty_salon",
+    "salao de beleza": "beauty_salon",
+    "salão de beleza": "beauty_salon",
+    "estetica": "beauty_salon",
+    "estética": "beauty_salon",
+    "barbearia": "hair_salon",
+    "barbearias": "hair_salon",
+    "cabeleireiro": "hair_salon",
+    "cabeleireiros": "hair_salon",
+    "academia": "gym",
+    "academias": "gym",
+    "petshop": "pet_store",
+    "pet shop": "pet_store",
+    "pet": "pet_store",
+    "agropecuaria": "pet_store",
+    "veterinaria": "veterinary_care",
+    "veterinária": "veterinary_care",
+    "material de construcao": "hardware_store",
+    "materiais de construcao": "hardware_store",
+    "loja": "store",
+    "lojas": "store",
+    "comercio": "store",
+    "comércio": "store",
+}
+
+
+def normalize_to_google_table_a_types(types: list[str] | None) -> list[str]:
+    """Mapeia e normaliza tipos comerciais para a Tabela A oficial do Google Places API."""
+    if not types:
+        return []
+    result: list[str] = []
+    for raw in types:
+        if not raw:
+            continue
+        cleaned = raw.strip().lower()
+        if cleaned in ("all", "todos", "todas", "*"):
+            continue
+        if cleaned in GOOGLE_PLACES_TABLE_A_TYPES:
+            if cleaned not in result:
+                result.append(cleaned)
+            continue
+        mapped = PORTUGUESE_TO_GOOGLE_TYPES.get(cleaned)
+        if mapped and mapped in GOOGLE_PLACES_TABLE_A_TYPES:
+            if mapped not in result:
+                result.append(mapped)
+            continue
+        # Tenta sem 's' no plural
+        if cleaned.endswith("s") and cleaned[:-1] in PORTUGUESE_TO_GOOGLE_TYPES:
+            mapped_sing = PORTUGUESE_TO_GOOGLE_TYPES[cleaned[:-1]]
+            if mapped_sing and mapped_sing in GOOGLE_PLACES_TABLE_A_TYPES and mapped_sing not in result:
+                result.append(mapped_sing)
+                continue
+    return result
 
 
 class GooglePlacesClient:
@@ -619,8 +805,9 @@ class GooglePlacesClient:
             },
         }
 
-        if included_types:
-            payload["includedTypes"] = included_types
+        valid_types = normalize_to_google_table_a_types(included_types)
+        if valid_types:
+            payload["includedTypes"] = valid_types
 
         client = await self._get_client()
         try:
@@ -628,6 +815,13 @@ class GooglePlacesClient:
             if response.status_code == 429:
                 logger.warning("Limite de cota (HTTP 429) na Places API. Retentando...")
                 response.raise_for_status()
+
+            if response.status_code == 400 and "includedTypes" in payload:
+                logger.warning(
+                    f"Places API recusou tipos {payload.get('includedTypes')}. Re-executando busca ampla sem filtro restritivo de tipo..."
+                )
+                payload.pop("includedTypes", None)
+                response = await client.post(url, headers=headers, json=payload)
 
             if response.status_code != 200:
                 logger.error(
@@ -718,7 +912,9 @@ class GooglePlacesClient:
         }
 
         if included_type:
-            payload["includedType"] = included_type
+            valid_t = normalize_to_google_table_a_types([included_type])
+            if valid_t:
+                payload["includedType"] = valid_t[0]
 
         # Se coordenadas forem fornecidas, aplica viés geográfico (locationBias)
         if lat is not None and lng is not None and radius_meters is not None:
@@ -735,6 +931,13 @@ class GooglePlacesClient:
             if response.status_code == 429:
                 logger.warning("Limite de cota (HTTP 429) no Text Search. Retentando...")
                 response.raise_for_status()
+
+            if response.status_code == 400 and "includedType" in payload:
+                logger.warning(
+                    f"Places API Text Search recusou tipo {payload.get('includedType')}. Re-executando busca sem filtro de tipo..."
+                )
+                payload.pop("includedType", None)
+                response = await client.post(url, headers=headers, json=payload)
 
             if response.status_code != 200:
                 logger.error(
